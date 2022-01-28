@@ -115,16 +115,19 @@ while looper==0:
     data = api_serve.text
     parse_json = json.loads(data)
     print("LEN Main_Array-->" + str(len(parse_json)) + " Ord. Fatti")
-    lbnr = config['BlackList']['bllastnbr']
     last_done = config['BlackList']['bllastnbr']
+
+    
+    
+    
+
     lenght = len(parse_json)
-    tgte = lenght #Lunghezza tutti i dati
-    print(tgte)
+    tgte = lenght -1 #Lunghezza tutti i dati
 
 
     if tgte < 0:
         print("Nessun ordine presente, attendo")
-    if tgte >= 0 and tgte <= int(lbnr):
+    if tgte >= 0 and tgte <= int(last_done):
         print("Ordine gia stampato, attendo nuovi ordini")
     if tgte >= 0:
         arleng = len(parse_json[tgte]['carrello'])
@@ -132,280 +135,588 @@ while looper==0:
         adapt_range = range(arleng)
         for index_par, item_par in enumerate(range(lenght)):
             curr_id= parse_json[item_par]['id_ordini']
-            if int(curr_id) <= int(lbnr):
-                print("Already done")
-            if (int(lbnr)+1) != int(curr_id) and int(lbnr) != int(curr_id):
-                sub_factor=int(lbnr)-int(curr_id)
-                print("SubFactor="+str(sub_factor))
-                todo=int(curr_id)-sub_factor
-                for indexfo,itemfo in enumerate(range(lenght)):
-                    if parse_json[indexfo]['id_ordini'] == str(todo):
-                        print("Found nr back")
-                        item_par=itemfo
-            if int(curr_id) > int(lbnr):
-                cart_len = len(parse_json[item_par]['carrello'])
-                dataout = parse_json[item_par]['id_ordini']
-                parser_orario = parse_json[item_par]['oraconsegna']
-                parser_t_o = parse_json[item_par]['tipo_ordine']
-                parser_nc = parse_json[item_par]['note_consegna']
-                parser_dconsegna = parse_json[item_par]['dataconsegna']
-                parser_data = parse_json[item_par]['nome_prodotto_lavorazione']
-                parser_oraacq = parse_json[item_par]['tempo_inizio_procedura_acquisto']
-                parser_payment_method = parse_json[item_par]['pagamento']
-                parser_tot_eur = parse_json[item_par]['totale']
-                if parse_json[item_par]['dati_utente'][0]['indirizzo'] == None:
-                    parsed_addr = ""
-                if parse_json[item_par]['dati_utente'][0]['indirizzo'] != None:
-                    parsed_addr = parse_json[item_par]['dati_utente'][0]['indirizzo']
-                if parse_json[item_par]['dati_utente'][0]['numero_civico'] == None:
-                    parsed_cv = ""
-                if parse_json[item_par]['dati_utente'][0]['numero_civico'] != None:
-                    parsed_cv = parse_json[item_par]['dati_utente'][0]['numero_civico']
-                if  parse_json[item_par]['dati_utente'][0]['citta'] != None:
-                    parsed_citta =  parse_json[item_par]['dati_utente'][0]['citta']
-                if  parse_json[item_par]['dati_utente'][0]['citta'] == None:
-                    parsed_citta =" "
-                if parse_json[item_par]['dati_utente'][0]['cap'] == None:
-                    parsed_cap= ""
-                if parse_json[item_par]['dati_utente'][0]['cap'] != None:
-                    parsed_cap= parse_json[item_par]['dati_utente'][0]['cap']
-                if parse_json[item_par]['dati_utente'][0]['provincia'] != None:
-                    parsed_prov= parse_json[item_par]['dati_utente'][0]['provincia']
-                if parse_json[item_par]['dati_utente'][0]['provincia'] == None:
-                    parsed_prov = ""
-                parser_name = (
-                            parse_json[item_par]['dati_utente'][0]['first_name'] + " " + parse_json[item_par]['dati_utente'][0][
-                        'last_name'])
-                parser_addr = (
-                            parsed_addr + " " + parsed_cv + "\n" + parsed_citta
-                            + " " + parsed_cap + "\n" + parsed_prov
-                            )
-                parser_tel = ("Tel: " + parse_json[item_par]['dati_utente'][0]['prefisso_int'] +
-                              " " + parse_json[item_par]['dati_utente'][0]['telefono'])
-                time.sleep(0.0)
-                print("Data parsed successfully")
+            with open('orders.json') as file:
+                tot_orders = json.loads(file.read())
+                
+            _temp = tot_orders["ordini"]
+            time.sleep(2)
 
-                with open(resource_path('SampleOrder.htm')) as htm_file:
-                    soup = BeautifulSoup(htm_file.read(), features='html.parser')
+            
+            if(len(tot_orders["ordini"]) != 0):
+                print("Current ID:",str(curr_id))
+                checkExist = False
+                for item in tot_orders["ordini"]:
+                    print(str(item))
+                    if(curr_id == item):
+                        checkExist = True
 
-                    tag = ""
+                if(checkExist == True):
+                    print("Already done")
+                    #Non fa nulla
+                else:
+                    #Inserisci nel json
+                    if int(curr_id) <= int(last_done):
+                            print("Already done")
+                    if (int(last_done)+1) != int(curr_id) and int(last_done) != int(curr_id):
+                        sub_factor=int(last_done)-int(curr_id)
+                        print("SubFactor="+str(sub_factor))
+                        todo=int(curr_id)-sub_factor
+                        for indexfo,itemfo in enumerate(range(lenght)):
+                            if parse_json[indexfo]['id_ordini'] == str(todo):
+                                print("Found nr back")
+                                item_par=itemfo
+                    if int(curr_id) > int(last_done):
+                        cart_len = len(parse_json[item_par]['carrello'])
+                        dataout = parse_json[item_par]['id_ordini']
+                        parser_orario = parse_json[item_par]['oraconsegna']
+                        parser_t_o = parse_json[item_par]['tipo_ordine']
+                        parser_nc = parse_json[item_par]['note_consegna']
+                        parser_dconsegna = parse_json[item_par]['dataconsegna']
+                        parser_data = parse_json[item_par]['nome_prodotto_lavorazione']
+                        parser_oraacq = parse_json[item_par]['tempo_inizio_procedura_acquisto']
+                        parser_payment_method = parse_json[item_par]['pagamento']
+                        parser_tot_eur = parse_json[item_par]['totale']
+                        if parse_json[item_par]['dati_utente'][0]['indirizzo'] == None:
+                            parsed_addr = ""
+                        if parse_json[item_par]['dati_utente'][0]['indirizzo'] != None:
+                            parsed_addr = parse_json[item_par]['dati_utente'][0]['indirizzo']
+                        if parse_json[item_par]['dati_utente'][0]['numero_civico'] == None:
+                            parsed_cv = ""
+                        if parse_json[item_par]['dati_utente'][0]['numero_civico'] != None:
+                            parsed_cv = parse_json[item_par]['dati_utente'][0]['numero_civico']
+                        if  parse_json[item_par]['dati_utente'][0]['citta'] != None:
+                            parsed_citta =  parse_json[item_par]['dati_utente'][0]['citta']
+                        if  parse_json[item_par]['dati_utente'][0]['citta'] == None:
+                            parsed_citta =" "
+                        if parse_json[item_par]['dati_utente'][0]['cap'] == None:
+                            parsed_cap= ""
+                        if parse_json[item_par]['dati_utente'][0]['cap'] != None:
+                            parsed_cap= parse_json[item_par]['dati_utente'][0]['cap']
+                        if parse_json[item_par]['dati_utente'][0]['provincia'] != None:
+                            parsed_prov= parse_json[item_par]['dati_utente'][0]['provincia']
+                        if parse_json[item_par]['dati_utente'][0]['provincia'] == None:
+                            parsed_prov = ""
+                        parser_name = (
+                                    parse_json[item_par]['dati_utente'][0]['first_name'] + " " + parse_json[item_par]['dati_utente'][0][
+                                'last_name'])
+                        parser_addr = (
+                                    parsed_addr + " " + parsed_cv + "\n" + parsed_citta
+                                    + " " + parsed_cap + "\n" + parsed_prov
+                                    )
+                        parser_tel = ("Tel: " + parse_json[item_par]['dati_utente'][0]['prefisso_int'] +
+                                    " " + parse_json[item_par]['dati_utente'][0]['telefono'])
+                        time.sleep(0.0)
+                        print("Data parsed successfully")
 
-                    for tag_ora in soup.find_all(id='OS'):
-                        print(tag_ora.text)
-                        print(tag)
-                        if tag_ora.text == "Ora_Prep":
-                            print("Found & Replaced ORA Consegna")
-                            tag_ora.string = ("Preparazione " + str(parser_oraacq))
+                        with open(resource_path('SampleOrder.htm')) as htm_file:
+                            soup = BeautifulSoup(htm_file.read(), features='html.parser')
 
-                    for tag_ord in soup.find_all(id='ID_ORDINE'):
-                        print("found_order")
-                        print(tag_ord.text)
-                        print(tag)
-                        if tag_ord.text == "NR_ORD":
-                            print("Found & Replaced NR_ORD")
-                            tag_ord.string = dataout
+                            tag = ""
 
-                    for tag_tipo in soup.find_all(id='Tipo_Ordine'):
-                        print("found_order")
-                        print(tag_tipo.text)
-                        print(tag)
-                        if tag_tipo.text == "Tipo_Ordine":
-                            print("Found & Replaced Tipo_Ordine")
-                            tag_tipo.string = parser_t_o
+                            for tag_ora in soup.find_all(id='OS'):
+                                print(tag_ora.text)
+                                print(tag)
+                                if tag_ora.text == "Ora_Prep":
+                                    print("Found & Replaced ORA Consegna")
+                                    tag_ora.string = ("Preparazione " + str(parser_oraacq))
 
-                    for tag_nc in soup.find_all(id='noteconsegna'):
-                        print("found_nc")
-                        print(tag_nc.text)
-                        print(tag)
-                        if tag_nc.text == "noteconsegna":
-                            print("Found & Replaced Note_Consegna")
-                            print(parser_t_o)
-                            if parser_nc == "":
-                                tag_nc.string = ""
-                                print("Empty")
-                                print(parser_nc)
-                            else:
-                                print("full")
-                                print(parser_nc)
-                                tag_nc.string = parser_nc
+                            for tag_ord in soup.find_all(id='ID_ORDINE'):
+                                print("found_order")
+                                print(tag_ord.text)
+                                print(tag)
+                                if tag_ord.text == "NR_ORD":
+                                    print("Found & Replaced NR_ORD")
+                                    tag_ord.string = dataout
 
-                    for tag_oc in soup.find_all(id='ora_cons'):
-                        print("found_order")
-                        print(tag_oc.text)
-                        print(tag)
-                        if tag_oc.text == "Consegna_Dati":
-                            print("Found & Replaced Consegna_Dati")
-                            tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n")
+                            for tag_tipo in soup.find_all(id='Tipo_Ordine'):
+                                print("found_order")
+                                print(tag_tipo.text)
+                                print(tag)
+                                if tag_tipo.text == "Tipo_Ordine":
+                                    print("Found & Replaced Tipo_Ordine")
+                                    tag_tipo.string = parser_t_o
 
-                    for tag_tot in soup.find_all(id='totale_ordine'):
-                        print("found_order")
-                        print(tag_tot.text)
-                        print(tag)
-                        if tag_tot.text == "Tot_Ordine":
-                            print("Found & Replaced tag_tot")
-                            tag_tot.string = (str(parser_tot_eur))
+                            for tag_nc in soup.find_all(id='noteconsegna'):
+                                print("found_nc")
+                                print(tag_nc.text)
+                                print(tag)
+                                if tag_nc.text == "noteconsegna":
+                                    print("Found & Replaced Note_Consegna")
+                                    print(parser_t_o)
+                                    if parser_nc == "":
+                                        tag_nc.string = ""
+                                        print("Empty")
+                                        print(parser_nc)
+                                    else:
+                                        print("full")
+                                        print(parser_nc)
+                                        tag_nc.string = parser_nc
 
-                    for tag_tp in soup.find_all(id='tipo_pagamento'):
-                        print("found_order")
-                        print(tag_tp.text)
-                        print(tag)
-                        if tag_tp.text == "Tipo_Pagamento":
-                            print("Found & Replaced tag_tp")
-                            tag_tp.string = (str(parser_payment_method))
+                            for tag_oc in soup.find_all(id='ora_cons'):
+                                print("found_order")
+                                print(tag_oc.text)
+                                print(tag)
+                                if tag_oc.text == "Consegna_Dati":
+                                    print("Found & Replaced Consegna_Dati")
+                                    tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n")
 
-                    for tag_tp in soup.find_all(id='tipo_pagamento'):
-                        print("found_order")
-                        print(tag_tp.text)
-                        print(tag)
-                        if tag_tp.text == "Tipo_Pagamento":
-                            print("Found & Replaced tag_tp")
-                            tag_tp.string = (str(parser_payment_method))
+                            for tag_tot in soup.find_all(id='totale_ordine'):
+                                print("found_order")
+                                print(tag_tot.text)
+                                print(tag)
+                                if tag_tot.text == "Tot_Ordine":
+                                    print("Found & Replaced tag_tot")
+                                    tag_tot.string = (str(parser_tot_eur))
 
-                    for tag_nln in soup.find_all(id='Nome_Cognome'):
-                        print("found_order")
-                        print(tag_nln.text)
-                        print(tag)
-                        if tag_nln.text == "Nome_Cognome":
-                            print("Found & Replaced tag_nln")
-                            tag_nln.string = (str(parser_name))
+                            for tag_tp in soup.find_all(id='tipo_pagamento'):
+                                print("found_order")
+                                print(tag_tp.text)
+                                print(tag)
+                                if tag_tp.text == "Tipo_Pagamento":
+                                    print("Found & Replaced tag_tp")
+                                    tag_tp.string = (str(parser_payment_method))
 
-                    for tag_addr in soup.find_all(id='address'):
-                        print("found_order")
-                        print(tag_addr.text)
-                        print(tag)
-                        if tag_addr.text == "dat_addr":
-                            print("Found & Replaced tag_addr")
-                            print(parser_addr)
-                            tag_addr.string = (str(parser_addr))
+                            for tag_tp in soup.find_all(id='tipo_pagamento'):
+                                print("found_order")
+                                print(tag_tp.text)
+                                print(tag)
+                                if tag_tp.text == "Tipo_Pagamento":
+                                    print("Found & Replaced tag_tp")
+                                    tag_tp.string = (str(parser_payment_method))
 
-                    for tag_tel in soup.find_all(id='tel'):
-                        print("found_order")
-                        print(tag_tel.text)
-                        print(tag)
-                        if tag_tel.text == "nr_tel":
-                            print("Found & Replaced tag_tel")
-                            tag_tel.string = (str(parser_tel))
+                            for tag_nln in soup.find_all(id='Nome_Cognome'):
+                                print("found_order")
+                                print(tag_nln.text)
+                                print(tag)
+                                if tag_nln.text == "Nome_Cognome":
+                                    print("Found & Replaced tag_nln")
+                                    tag_nln.string = (str(parser_name))
 
-                    # Adding cust to body style in SampleOrder.htm
-                    for tag in soup.findAll(id="body"):
-                        tag['style'] = ("max-width: " + maxwidth + "mm; font-size: " + fontsize + "px ;")
+                            for tag_addr in soup.find_all(id='address'):
+                                print("found_order")
+                                print(tag_addr.text)
+                                print(tag)
+                                if tag_addr.text == "dat_addr":
+                                    print("Found & Replaced tag_addr")
+                                    print(parser_addr)
+                                    tag_addr.string = (str(parser_addr))
 
-                        # Building needed arrays
-                    arr_tutti_i_dati = [""] * cart_len
-                    arr_nome_prodotto = [""] * cart_len
-                    arr_aggiungere = [""] * cart_len
-                    arr_rimuovere = [""] * cart_len
-                    arr_prodotto = [""] * cart_len
-                    arr_qta = [0] * cart_len
+                            for tag_tel in soup.find_all(id='tel'):
+                                print("found_order")
+                                print(tag_tel.text)
+                                print(tag)
+                                if tag_tel.text == "nr_tel":
+                                    print("Found & Replaced tag_tel")
+                                    tag_tel.string = (str(parser_tel))
 
-                    # Cycle for first data load
-                    print("cycl-1")
-                    print(cart_len)
-                    print("AAA!")
-                    print("CartLeng+"+str(cart_len))
-                    for index_dp, item_dp in enumerate(range(cart_len)):
-                        arr_tutti_i_dati[item_dp] = parse_json[item_par]['carrello'][item_dp]['id_prodotto']
-                        print(str(item_dp) + "-->" + arr_tutti_i_dati[item_dp])
+                            # Adding cust to body style in SampleOrder.htm
+                            for tag in soup.findAll(id="body"):
+                                tag['style'] = ("max-width: " + maxwidth + "mm; font-size: " + fontsize + "px ;")
 
-                    # Second Cycle for Second array and third
-                    occurrences = {}
+                                # Building needed arrays
+                            arr_tutti_i_dati = [""] * cart_len
+                            arr_nome_prodotto = [""] * cart_len
+                            arr_aggiungere = [""] * cart_len
+                            arr_rimuovere = [""] * cart_len
+                            arr_prodotto = [""] * cart_len
+                            arr_qta = [0] * cart_len
 
-                    for i in arr_tutti_i_dati:
-                        if i in occurrences:
-                            occurrences[i] += 1
-                        else:
-                            occurrences[i] = 1
+                            # Cycle for first data load
+                            print("cycl-1")
+                            print(cart_len)
+                            print("AAA!")
+                            print("CartLeng+"+str(cart_len))
+                            for index_dp, item_dp in enumerate(range(cart_len)):
+                                arr_tutti_i_dati[item_dp] = parse_json[item_par]['carrello'][item_dp]['id_prodotto']
+                                print(str(item_dp) + "-->" + arr_tutti_i_dati[item_dp])
 
-                    counter = 0
-                    
-                    print("for key, value in occurrences.items()")
-                    for key, value in occurrences.items():
-                        print(key)
-                        print(value)
-                        arr_prodotto[counter] = key
-                        arr_qta[counter] = value
-                        counter = counter + 1
+                            # Second Cycle for Second array and third
+                            occurrences = {}
 
-                    # getting names/things to add/remove
-                    counter=0
+                            for i in arr_tutti_i_dati:
+                                if i in occurrences:
+                                    occurrences[i] += 1
+                                else:
+                                    occurrences[i] = 1
 
-
-                    print("arr_prodotto:", str(arr_prodotto))
-                    
-                    #! FIX ERRORE
-                    for index_tp, item_tp in enumerate(range(cart_len)):
-
-                        for item, i in enumerate(range(len(arr_prodotto))):
-                            print(parse_json[item_par]['carrello'][item_tp]['id_prodotto'],"->",arr_prodotto[i])
+                            counter = 0
                             
-                            if parse_json[item_par]['carrello'][item_tp]['id_prodotto'] == arr_prodotto[i]:
-                                print(parse_json[item_par]['carrello'][item_tp]['nome_prodotto'])
-                                arr_nome_prodotto[i] = parse_json[item_par]['carrello'][item_tp]['nome_prodotto']
-                                arr_aggiungere[i] = parse_json[item_par]['carrello'][item_tp]['aggiungere']
-                                arr_rimuovere[i] = parse_json[item_par]['carrello'][item_tp]['rimuovere']
-                          
-                    #! FIX ERRORE      
+                            print("for key, value in occurrences.items()")
+                            for key, value in occurrences.items():
+                                print(key)
+                                print(value)
+                                arr_prodotto[counter] = key
+                                arr_qta[counter] = value
+                                counter = counter + 1
 
-                    counter = 0
-                    div = soup.select_one("#links")
-                    for index_wo, item_wo in enumerate(range(cart_len)):
-                        if arr_aggiungere[item_wo] != "" and arr_rimuovere[item_wo] != "" and arr_prodotto[item_wo] != "":
-                            new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
-                                counter] + "</strong> X <strong>" + str(
-                                arr_qta[counter]) + "</strong>"
-                                                            "<br>+" + arr_aggiungere[counter] +
-                                                            "<br>-" + arr_rimuovere[counter] +
-                                                            "<br>" + "--------------")
-                            div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
-                        if arr_aggiungere[item_wo] == "" and arr_rimuovere[item_wo] == "" and arr_prodotto[item_wo] != "":
-                            new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                            # getting names/things to add/remove
+                            counter=0
+
+
+                            print("arr_prodotto:", str(arr_prodotto))
+                            
+                            #! FIX ERRORE
+                            for index_tp, item_tp in enumerate(range(cart_len)):
+
+                                for item, i in enumerate(range(len(arr_prodotto))):
+                                    print(parse_json[item_par]['carrello'][item_tp]['id_prodotto'],"->",arr_prodotto[i])
+                                    
+                                    if parse_json[item_par]['carrello'][item_tp]['id_prodotto'] == arr_prodotto[i]:
+                                        print(parse_json[item_par]['carrello'][item_tp]['nome_prodotto'])
+                                        arr_nome_prodotto[i] = parse_json[item_par]['carrello'][item_tp]['nome_prodotto']
+                                        arr_aggiungere[i] = parse_json[item_par]['carrello'][item_tp]['aggiungere']
+                                        arr_rimuovere[i] = parse_json[item_par]['carrello'][item_tp]['rimuovere']
+                                
+                            #! FIX ERRORE      
+
+                            counter = 0
+                            div = soup.select_one("#links")
+                            for index_wo, item_wo in enumerate(range(cart_len)):
+                                if arr_aggiungere[item_wo] != "" and arr_rimuovere[item_wo] != "" and arr_prodotto[item_wo] != "":
+                                    new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
                                         counter] + "</strong> X <strong>" + str(
                                         arr_qta[counter]) + "</strong>"
-                                                            "<br>" + "--------------")
-                            div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
-                        if arr_aggiungere[item_wo] != "" and arr_rimuovere[item_wo] == "" and arr_prodotto[item_wo] != "":
-                            new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
-                                        counter] + "</strong> X <strong>" + str(
-                                        arr_qta[counter]) + "</strong>"
-                                                            "<br>+" + arr_aggiungere[counter] +
-                                                            "<br>" + "--------------")
-                            div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
-                        if arr_aggiungere[item_wo] == "" and arr_rimuovere[item_wo] != "" and arr_prodotto[item_wo] != "":
-                            new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
-                                        counter] + "</strong> X <strong>" + str(
-                                        arr_qta[counter]) + "</strong>"
-                                                            "<br>-" + arr_rimuovere[counter] +
-                                                            "<br>" + "--------------")
-                            div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
-                        counter = counter + 1
+                                                                    "<br>+" + arr_aggiungere[counter] +
+                                                                    "<br>-" + arr_rimuovere[counter] +
+                                                                    "<br>" + "--------------")
+                                    div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                                if arr_aggiungere[item_wo] == "" and arr_rimuovere[item_wo] == "" and arr_prodotto[item_wo] != "":
+                                    new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                                counter] + "</strong> X <strong>" + str(
+                                                arr_qta[counter]) + "</strong>"
+                                                                    "<br>" + "--------------")
+                                    div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                                if arr_aggiungere[item_wo] != "" and arr_rimuovere[item_wo] == "" and arr_prodotto[item_wo] != "":
+                                    new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                                counter] + "</strong> X <strong>" + str(
+                                                arr_qta[counter]) + "</strong>"
+                                                                    "<br>+" + arr_aggiungere[counter] +
+                                                                    "<br>" + "--------------")
+                                    div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                                if arr_aggiungere[item_wo] == "" and arr_rimuovere[item_wo] != "" and arr_prodotto[item_wo] != "":
+                                    new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                                counter] + "</strong> X <strong>" + str(
+                                                arr_qta[counter]) + "</strong>"
+                                                                    "<br>-" + arr_rimuovere[counter] +
+                                                                    "<br>" + "--------------")
+                                    div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                                counter = counter + 1
 
-                    new_txt = soup.prettify()
+                            new_txt = soup.prettify()
 
-                    with open('Order_Compiled.html', mode='w') as new_htm_file:
-                        print(soup)
-                        print("----")
-                        print(new_txt)
-                        new_htm_file.write(str(soup))
-                        time.sleep(4)
-                        print("Save Successful")
+                            with open('Order_Compiled.html', mode='w') as new_htm_file:
+                                print(soup)
+                                print("----")
+                                print(new_txt)
+                                new_htm_file.write(str(soup))
+                                time.sleep(4)
+                                print("Save Successful")
 
-                    final_printout = (resource_path(
-                                "Application_Support\p2p\p2p.exe") + " -print-to-default -print-settings ""noscale"" " + " printout.pdf")
-                    wkcomm = (resource_path("Application_Support\wk\w2pdf.exe") +
-                                      " --encoding utf-8 --margin-top 1mm --margin-bottom 7mm --margin-left 0mm --margin-right 0mm "
-                                      + "Order_Compiled.html" + " printout.pdf")
-                    pwktohtml = subprocess.Popen(wkcomm, shell=True,
-                                                         stdout=subprocess.PIPE, universal_newlines=True)
-                    time.sleep(30)
-                    #time.sleep(3)
-                    printout_send = subprocess.Popen(final_printout, shell=True,
-                                                             stdout=subprocess.PIPE, universal_newlines=True)
-                    config.set('BlackList', 'bllastnbr', str(curr_id))
-                    api_print = (api_link+"apistampa.php?idordine="+curr_id+"&key="+apikey)
-                    send_print = requests.get(api_print)
-                    with open('config.ini', 'w') as configfile:
-                        config.write(configfile)
-                        print("File Saved")
+                            final_printout = (resource_path(
+                                        "Application_Support\p2p\p2p.exe") + " -print-to-default -print-settings ""noscale"" " + " printout.pdf")
+                            wkcomm = (resource_path("Application_Support\wk\w2pdf.exe") +
+                                            " --encoding utf-8 --margin-top 1mm --margin-bottom 7mm --margin-left 0mm --margin-right 0mm "
+                                            + "Order_Compiled.html" + " printout.pdf")
+                            pwktohtml = subprocess.Popen(wkcomm, shell=True,
+                                                                stdout=subprocess.PIPE, universal_newlines=True)
+                            #time.sleep(30)
+                            time.sleep(3)
+                            printout_send = subprocess.Popen(final_printout, shell=True,
+                                                                    stdout=subprocess.PIPE, universal_newlines=True)
+                            config.set('BlackList', 'bllastnbr', str(curr_id))
+
+                            tot_orders["ordini"].append(curr_id)
+                    
+                            with open("orders.json", "w") as file:
+                                json.dump(tot_orders, file)
+
+                            api_print = (api_link+"apistampa.php?idordine="+curr_id+"&key="+apikey)
+                            send_print = requests.get(api_print)
+                            with open('config.ini', 'w') as configfile:
+                                config.write(configfile)
+                                print("File Saved")
+                    
+            else:
+                if int(curr_id) <= int(last_done):
+                        print("Already done")
+                if (int(last_done)+1) != int(curr_id) and int(last_done) != int(curr_id):
+                    sub_factor=int(last_done)-int(curr_id)
+                    print("SubFactor="+str(sub_factor))
+                    todo=int(curr_id)-sub_factor
+                    for indexfo,itemfo in enumerate(range(lenght)):
+                        if parse_json[indexfo]['id_ordini'] == str(todo):
+                            print("Found nr back")
+                            item_par=itemfo
+                if int(curr_id) > int(last_done):
+                    cart_len = len(parse_json[item_par]['carrello'])
+                    dataout = parse_json[item_par]['id_ordini']
+                    parser_orario = parse_json[item_par]['oraconsegna']
+                    parser_t_o = parse_json[item_par]['tipo_ordine']
+                    parser_nc = parse_json[item_par]['note_consegna']
+                    parser_dconsegna = parse_json[item_par]['dataconsegna']
+                    parser_data = parse_json[item_par]['nome_prodotto_lavorazione']
+                    parser_oraacq = parse_json[item_par]['tempo_inizio_procedura_acquisto']
+                    parser_payment_method = parse_json[item_par]['pagamento']
+                    parser_tot_eur = parse_json[item_par]['totale']
+                    if parse_json[item_par]['dati_utente'][0]['indirizzo'] == None:
+                        parsed_addr = ""
+                    if parse_json[item_par]['dati_utente'][0]['indirizzo'] != None:
+                        parsed_addr = parse_json[item_par]['dati_utente'][0]['indirizzo']
+                    if parse_json[item_par]['dati_utente'][0]['numero_civico'] == None:
+                        parsed_cv = ""
+                    if parse_json[item_par]['dati_utente'][0]['numero_civico'] != None:
+                        parsed_cv = parse_json[item_par]['dati_utente'][0]['numero_civico']
+                    if  parse_json[item_par]['dati_utente'][0]['citta'] != None:
+                        parsed_citta =  parse_json[item_par]['dati_utente'][0]['citta']
+                    if  parse_json[item_par]['dati_utente'][0]['citta'] == None:
+                        parsed_citta =" "
+                    if parse_json[item_par]['dati_utente'][0]['cap'] == None:
+                        parsed_cap= ""
+                    if parse_json[item_par]['dati_utente'][0]['cap'] != None:
+                        parsed_cap= parse_json[item_par]['dati_utente'][0]['cap']
+                    if parse_json[item_par]['dati_utente'][0]['provincia'] != None:
+                        parsed_prov= parse_json[item_par]['dati_utente'][0]['provincia']
+                    if parse_json[item_par]['dati_utente'][0]['provincia'] == None:
+                        parsed_prov = ""
+                    parser_name = (
+                                parse_json[item_par]['dati_utente'][0]['first_name'] + " " + parse_json[item_par]['dati_utente'][0][
+                            'last_name'])
+                    parser_addr = (
+                                parsed_addr + " " + parsed_cv + "\n" + parsed_citta
+                                + " " + parsed_cap + "\n" + parsed_prov
+                                )
+                    parser_tel = ("Tel: " + parse_json[item_par]['dati_utente'][0]['prefisso_int'] +
+                                " " + parse_json[item_par]['dati_utente'][0]['telefono'])
+                    time.sleep(0.0)
+                    print("Data parsed successfully")
+
+                    with open(resource_path('SampleOrder.htm')) as htm_file:
+                        soup = BeautifulSoup(htm_file.read(), features='html.parser')
+
+                        tag = ""
+
+                        for tag_ora in soup.find_all(id='OS'):
+                            print(tag_ora.text)
+                            print(tag)
+                            if tag_ora.text == "Ora_Prep":
+                                print("Found & Replaced ORA Consegna")
+                                tag_ora.string = ("Preparazione " + str(parser_oraacq))
+
+                        for tag_ord in soup.find_all(id='ID_ORDINE'):
+                            print("found_order")
+                            print(tag_ord.text)
+                            print(tag)
+                            if tag_ord.text == "NR_ORD":
+                                print("Found & Replaced NR_ORD")
+                                tag_ord.string = dataout
+
+                        for tag_tipo in soup.find_all(id='Tipo_Ordine'):
+                            print("found_order")
+                            print(tag_tipo.text)
+                            print(tag)
+                            if tag_tipo.text == "Tipo_Ordine":
+                                print("Found & Replaced Tipo_Ordine")
+                                tag_tipo.string = parser_t_o
+
+                        for tag_nc in soup.find_all(id='noteconsegna'):
+                            print("found_nc")
+                            print(tag_nc.text)
+                            print(tag)
+                            if tag_nc.text == "noteconsegna":
+                                print("Found & Replaced Note_Consegna")
+                                print(parser_t_o)
+                                if parser_nc == "":
+                                    tag_nc.string = ""
+                                    print("Empty")
+                                    print(parser_nc)
+                                else:
+                                    print("full")
+                                    print(parser_nc)
+                                    tag_nc.string = parser_nc
+
+                        for tag_oc in soup.find_all(id='ora_cons'):
+                            print("found_order")
+                            print(tag_oc.text)
+                            print(tag)
+                            if tag_oc.text == "Consegna_Dati":
+                                print("Found & Replaced Consegna_Dati")
+                                tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n")
+
+                        for tag_tot in soup.find_all(id='totale_ordine'):
+                            print("found_order")
+                            print(tag_tot.text)
+                            print(tag)
+                            if tag_tot.text == "Tot_Ordine":
+                                print("Found & Replaced tag_tot")
+                                tag_tot.string = (str(parser_tot_eur))
+
+                        for tag_tp in soup.find_all(id='tipo_pagamento'):
+                            print("found_order")
+                            print(tag_tp.text)
+                            print(tag)
+                            if tag_tp.text == "Tipo_Pagamento":
+                                print("Found & Replaced tag_tp")
+                                tag_tp.string = (str(parser_payment_method))
+
+                        for tag_tp in soup.find_all(id='tipo_pagamento'):
+                            print("found_order")
+                            print(tag_tp.text)
+                            print(tag)
+                            if tag_tp.text == "Tipo_Pagamento":
+                                print("Found & Replaced tag_tp")
+                                tag_tp.string = (str(parser_payment_method))
+
+                        for tag_nln in soup.find_all(id='Nome_Cognome'):
+                            print("found_order")
+                            print(tag_nln.text)
+                            print(tag)
+                            if tag_nln.text == "Nome_Cognome":
+                                print("Found & Replaced tag_nln")
+                                tag_nln.string = (str(parser_name))
+
+                        for tag_addr in soup.find_all(id='address'):
+                            print("found_order")
+                            print(tag_addr.text)
+                            print(tag)
+                            if tag_addr.text == "dat_addr":
+                                print("Found & Replaced tag_addr")
+                                print(parser_addr)
+                                tag_addr.string = (str(parser_addr))
+
+                        for tag_tel in soup.find_all(id='tel'):
+                            print("found_order")
+                            print(tag_tel.text)
+                            print(tag)
+                            if tag_tel.text == "nr_tel":
+                                print("Found & Replaced tag_tel")
+                                tag_tel.string = (str(parser_tel))
+
+                        # Adding cust to body style in SampleOrder.htm
+                        for tag in soup.findAll(id="body"):
+                            tag['style'] = ("max-width: " + maxwidth + "mm; font-size: " + fontsize + "px ;")
+
+                            # Building needed arrays
+                        arr_tutti_i_dati = [""] * cart_len
+                        arr_nome_prodotto = [""] * cart_len
+                        arr_aggiungere = [""] * cart_len
+                        arr_rimuovere = [""] * cart_len
+                        arr_prodotto = [""] * cart_len
+                        arr_qta = [0] * cart_len
+
+                        # Cycle for first data load
+                        print("cycl-1")
+                        print(cart_len)
+                        print("AAA!")
+                        print("CartLeng+"+str(cart_len))
+                        for index_dp, item_dp in enumerate(range(cart_len)):
+                            arr_tutti_i_dati[item_dp] = parse_json[item_par]['carrello'][item_dp]['id_prodotto']
+                            print(str(item_dp) + "-->" + arr_tutti_i_dati[item_dp])
+
+                        # Second Cycle for Second array and third
+                        occurrences = {}
+
+                        for i in arr_tutti_i_dati:
+                            if i in occurrences:
+                                occurrences[i] += 1
+                            else:
+                                occurrences[i] = 1
+
+                        counter = 0
+                        
+                        print("for key, value in occurrences.items()")
+                        for key, value in occurrences.items():
+                            print(key)
+                            print(value)
+                            arr_prodotto[counter] = key
+                            arr_qta[counter] = value
+                            counter = counter + 1
+
+                        # getting names/things to add/remove
+                        counter=0
 
 
+                        print("arr_prodotto:", str(arr_prodotto))
+                        
+                        #! FIX ERRORE
+                        for index_tp, item_tp in enumerate(range(cart_len)):
+
+                            for item, i in enumerate(range(len(arr_prodotto))):
+                                print(parse_json[item_par]['carrello'][item_tp]['id_prodotto'],"->",arr_prodotto[i])
+                                
+                                if parse_json[item_par]['carrello'][item_tp]['id_prodotto'] == arr_prodotto[i]:
+                                    print(parse_json[item_par]['carrello'][item_tp]['nome_prodotto'])
+                                    arr_nome_prodotto[i] = parse_json[item_par]['carrello'][item_tp]['nome_prodotto']
+                                    arr_aggiungere[i] = parse_json[item_par]['carrello'][item_tp]['aggiungere']
+                                    arr_rimuovere[i] = parse_json[item_par]['carrello'][item_tp]['rimuovere']
+                            
+                        #! FIX ERRORE      
+
+                        counter = 0
+                        div = soup.select_one("#links")
+                        for index_wo, item_wo in enumerate(range(cart_len)):
+                            if arr_aggiungere[item_wo] != "" and arr_rimuovere[item_wo] != "" and arr_prodotto[item_wo] != "":
+                                new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                    counter] + "</strong> X <strong>" + str(
+                                    arr_qta[counter]) + "</strong>"
+                                                                "<br>+" + arr_aggiungere[counter] +
+                                                                "<br>-" + arr_rimuovere[counter] +
+                                                                "<br>" + "--------------")
+                                div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                            if arr_aggiungere[item_wo] == "" and arr_rimuovere[item_wo] == "" and arr_prodotto[item_wo] != "":
+                                new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                            counter] + "</strong> X <strong>" + str(
+                                            arr_qta[counter]) + "</strong>"
+                                                                "<br>" + "--------------")
+                                div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                            if arr_aggiungere[item_wo] != "" and arr_rimuovere[item_wo] == "" and arr_prodotto[item_wo] != "":
+                                new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                            counter] + "</strong> X <strong>" + str(
+                                            arr_qta[counter]) + "</strong>"
+                                                                "<br>+" + arr_aggiungere[counter] +
+                                                                "<br>" + "--------------")
+                                div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                            if arr_aggiungere[item_wo] == "" and arr_rimuovere[item_wo] != "" and arr_prodotto[item_wo] != "":
+                                new_string_to_append = ("<br><strong>" + arr_nome_prodotto[
+                                            counter] + "</strong> X <strong>" + str(
+                                            arr_qta[counter]) + "</strong>"
+                                                                "<br>-" + arr_rimuovere[counter] +
+                                                                "<br>" + "--------------")
+                                div.append(BeautifulSoup(new_string_to_append, 'html.parser'))
+                            counter = counter + 1
+
+                        new_txt = soup.prettify()
+
+                        with open('Order_Compiled.html', mode='w') as new_htm_file:
+                            print(soup)
+                            print("----")
+                            print(new_txt)
+                            new_htm_file.write(str(soup))
+                            time.sleep(4)
+                            print("Save Successful")
+
+                        final_printout = (resource_path(
+                                    "Application_Support\p2p\p2p.exe") + " -print-to-default -print-settings ""noscale"" " + " printout.pdf")
+                        wkcomm = (resource_path("Application_Support\wk\w2pdf.exe") +
+                                        " --encoding utf-8 --margin-top 1mm --margin-bottom 7mm --margin-left 0mm --margin-right 0mm "
+                                        + "Order_Compiled.html" + " printout.pdf")
+                        pwktohtml = subprocess.Popen(wkcomm, shell=True,
+                                                            stdout=subprocess.PIPE, universal_newlines=True)
+                        #time.sleep(30)
+                        time.sleep(3)
+                        printout_send = subprocess.Popen(final_printout, shell=True,
+                                                                stdout=subprocess.PIPE, universal_newlines=True)
+                        config.set('BlackList', 'bllastnbr', str(curr_id))
+
+                        tot_orders["ordini"].append(curr_id)
+                
+                        with open("orders.json", "w") as file:
+                            json.dump(tot_orders, file)
+
+                        api_print = (api_link+"apistampa.php?idordine="+curr_id+"&key="+apikey)
+                        send_print = requests.get(api_print)
+                        with open('config.ini', 'w') as configfile:
+                            config.write(configfile)
+                            print("File Saved")
+            
+    
     time.sleep(10)
