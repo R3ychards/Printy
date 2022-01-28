@@ -107,6 +107,7 @@ if First_run == ("True"):
 #Main cycle, with time
 looper=0
 while looper==0:
+    parse_json="";
     print("Connection to api..")
     api_serve = requests.get(api)
     print("Server_Response:" + str(api_serve.status_code))
@@ -117,8 +118,10 @@ while looper==0:
     lbnr = config['BlackList']['bllastnbr']
     last_done = config['BlackList']['bllastnbr']
     lenght = len(parse_json)
-    tgte = lenght - 1
+    tgte = lenght #Lunghezza tutti i dati
     print(tgte)
+
+
     if tgte < 0:
         print("Nessun ordine presente, attendo")
     if tgte >= 0 and tgte <= int(lbnr):
@@ -314,7 +317,8 @@ while looper==0:
                             occurrences[i] = 1
 
                     counter = 0
-
+                    
+                    print("for key, value in occurrences.items()")
                     for key, value in occurrences.items():
                         print(key)
                         print(value)
@@ -324,21 +328,24 @@ while looper==0:
 
                     # getting names/things to add/remove
                     counter=0
-                    for index_tp, item_tp in enumerate(range(cart_len)):
-                        if counter==171:
-                            print("Breakpoint")
-                            print(arr_prodotto[item_tp])
-                            breakpoint()
-                        if parse_json[item_par]['carrello'][item_tp]['id_prodotto'] == arr_prodotto[item_tp] and item_tp <= item_par:
-                            print(parse_json[item_par]['carrello'][item_tp]['nome_prodotto'])
-                            arr_nome_prodotto[item_tp] = parse_json[item_par]['carrello'][item_tp][
-                                'nome_prodotto']
-                            arr_aggiungere[item_tp] = parse_json[item_par]['carrello'][item_tp]['aggiungere']
-                            arr_rimuovere[item_tp] = parse_json[item_par]['carrello'][item_tp]['rimuovere']
-                        counter=counter+1
 
-                            # Write to append
-                    print(len(occurrences))
+
+                    print("arr_prodotto:", str(arr_prodotto))
+                    
+                    #! FIX ERRORE
+                    for index_tp, item_tp in enumerate(range(cart_len)):
+
+                        for item, i in enumerate(range(len(arr_prodotto))):
+                            print(parse_json[item_par]['carrello'][item_tp]['id_prodotto'],"->",arr_prodotto[i])
+                            
+                            if parse_json[item_par]['carrello'][item_tp]['id_prodotto'] == arr_prodotto[i]:
+                                print(parse_json[item_par]['carrello'][item_tp]['nome_prodotto'])
+                                arr_nome_prodotto[i] = parse_json[item_par]['carrello'][item_tp]['nome_prodotto']
+                                arr_aggiungere[i] = parse_json[item_par]['carrello'][item_tp]['aggiungere']
+                                arr_rimuovere[i] = parse_json[item_par]['carrello'][item_tp]['rimuovere']
+                          
+                    #! FIX ERRORE      
+
                     counter = 0
                     div = soup.select_one("#links")
                     for index_wo, item_wo in enumerate(range(cart_len)):
@@ -389,7 +396,8 @@ while looper==0:
                                       + "Order_Compiled.html" + " printout.pdf")
                     pwktohtml = subprocess.Popen(wkcomm, shell=True,
                                                          stdout=subprocess.PIPE, universal_newlines=True)
-                    time.sleep(3)
+                    time.sleep(30)
+                    #time.sleep(3)
                     printout_send = subprocess.Popen(final_printout, shell=True,
                                                              stdout=subprocess.PIPE, universal_newlines=True)
                     config.set('BlackList', 'bllastnbr', str(curr_id))
