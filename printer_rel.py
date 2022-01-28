@@ -81,7 +81,7 @@ if api_link == "":
     config.set('API', 'api_key', key)
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
-        time.sleep(0.4)
+        #time.sleep(0.4)
     api_link = config['API']['api_link']
     apikey = config['API']['api_key']
     api = (api_link + "api.php?key=" + apikey)
@@ -97,11 +97,11 @@ if First_run == ("True"):
             config.set('API', 'firstrun', "False")
             with open('config.ini','w') as configfile:
                 config.write(configfile)
-            time.sleep(0.6)
+            #time.sleep(0.6)
             sys.exit()
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv[1:]), None, 1)
-            time.sleep(0.6)
+            #time.sleep(0.6)
             sys.exit()
 
 #Main cycle, with time
@@ -138,15 +138,13 @@ while looper==0:
             with open('orders.json') as file:
                 tot_orders = json.loads(file.read())
                 
-            _temp = tot_orders["ordini"]
-            time.sleep(2)
+            #time.sleep(2)
 
             
             if(len(tot_orders["ordini"]) != 0):
                 print("Current ID:",str(curr_id))
                 checkExist = False
                 for item in tot_orders["ordini"]:
-                    print(str(item))
                     if(curr_id == item):
                         checkExist = True
 
@@ -205,7 +203,7 @@ while looper==0:
                                     )
                         parser_tel = ("Tel: " + parse_json[item_par]['dati_utente'][0]['prefisso_int'] +
                                     " " + parse_json[item_par]['dati_utente'][0]['telefono'])
-                        time.sleep(0.0)
+                        #time.sleep(0.0)
                         print("Data parsed successfully")
 
                         with open(resource_path('SampleOrder.htm')) as htm_file:
@@ -409,7 +407,7 @@ while looper==0:
                                 print("----")
                                 print(new_txt)
                                 new_htm_file.write(str(soup))
-                                time.sleep(4)
+                                #time.sleep(4)
                                 print("Save Successful")
 
                             final_printout = (resource_path(
@@ -420,7 +418,7 @@ while looper==0:
                             pwktohtml = subprocess.Popen(wkcomm, shell=True,
                                                                 stdout=subprocess.PIPE, universal_newlines=True)
                             #time.sleep(30)
-                            time.sleep(3)
+                            #time.sleep(3)
                             printout_send = subprocess.Popen(final_printout, shell=True,
                                                                     stdout=subprocess.PIPE, universal_newlines=True)
                             config.set('BlackList', 'bllastnbr', str(curr_id))
@@ -434,7 +432,7 @@ while looper==0:
                             send_print = requests.get(api_print)
                             with open('config.ini', 'w') as configfile:
                                 config.write(configfile)
-                                print("File Saved")
+                                print("File Saved, ID:", curr_id)
                     
             else:
                 if int(curr_id) <= int(last_done):
@@ -487,7 +485,7 @@ while looper==0:
                                 )
                     parser_tel = ("Tel: " + parse_json[item_par]['dati_utente'][0]['prefisso_int'] +
                                 " " + parse_json[item_par]['dati_utente'][0]['telefono'])
-                    time.sleep(0.0)
+                    #time.sleep(0.0)
                     print("Data parsed successfully")
 
                     with open(resource_path('SampleOrder.htm')) as htm_file:
@@ -691,7 +689,7 @@ while looper==0:
                             print("----")
                             print(new_txt)
                             new_htm_file.write(str(soup))
-                            time.sleep(4)
+                            #time.sleep(4)
                             print("Save Successful")
 
                         final_printout = (resource_path(
@@ -702,7 +700,7 @@ while looper==0:
                         pwktohtml = subprocess.Popen(wkcomm, shell=True,
                                                             stdout=subprocess.PIPE, universal_newlines=True)
                         #time.sleep(30)
-                        time.sleep(3)
+                        #time.sleep(3)
                         printout_send = subprocess.Popen(final_printout, shell=True,
                                                                 stdout=subprocess.PIPE, universal_newlines=True)
                         config.set('BlackList', 'bllastnbr', str(curr_id))
@@ -716,7 +714,24 @@ while looper==0:
                         send_print = requests.get(api_print)
                         with open('config.ini', 'w') as configfile:
                             config.write(configfile)
-                            print("File Saved")
+                            print("File Saved, ID:", curr_id)
             
-    
-    time.sleep(10)
+    time_to_sleep = 90
+
+    # setup toolbar
+    sys.stdout.write("[%s]" % (" " * time_to_sleep))
+    sys.stdout.flush()
+    sys.stdout.write("\b" * (time_to_sleep+1)) # return to start of line, after '['
+
+    for i in range(time_to_sleep):
+        time.sleep(1) # do real work here
+        # update the bar
+        sys.stdout.write("=")
+        sys.stdout.flush()
+
+    sys.stdout.write("]\n") # this ends the progress bar
+
+    command = 'clear'
+    if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
+        command = 'cls'
+    os.system(command)
