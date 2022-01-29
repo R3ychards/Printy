@@ -50,6 +50,13 @@ else:
     copyfile(resource_path('PaperSettings.ini'), 'PaperSettings.ini')
     print('Wrote configs files.')
 
+if os.path.isfile('orders.json'):
+    ("JSON Already in Path")
+else:
+    copyfile(resource_path('orders.json'), 'orders.json')
+    print("Wrote JSON file")
+
+
 config = configparser.ConfigParser()
 configpap = configparser.ConfigParser()
 config.read('config.ini')
@@ -418,7 +425,7 @@ while looper==0:
                             pwktohtml = subprocess.Popen(wkcomm, shell=True,
                                                                 stdout=subprocess.PIPE, universal_newlines=True)
                             #time.sleep(30)
-                            #time.sleep(3)
+                            time.sleep(4)
                             printout_send = subprocess.Popen(final_printout, shell=True,
                                                                     stdout=subprocess.PIPE, universal_newlines=True)
                             config.set('BlackList', 'bllastnbr', str(curr_id))
@@ -700,7 +707,7 @@ while looper==0:
                         pwktohtml = subprocess.Popen(wkcomm, shell=True,
                                                             stdout=subprocess.PIPE, universal_newlines=True)
                         #time.sleep(30)
-                        #time.sleep(3)
+                        time.sleep(4)
                         printout_send = subprocess.Popen(final_printout, shell=True,
                                                                 stdout=subprocess.PIPE, universal_newlines=True)
                         config.set('BlackList', 'bllastnbr', str(curr_id))
