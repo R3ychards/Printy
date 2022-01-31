@@ -180,6 +180,7 @@ while looper==0:
                         parser_data = parse_json[item_par]['nome_prodotto_lavorazione']
                         parser_oraacq = parse_json[item_par]['tempo_inizio_procedura_acquisto']
                         parser_payment_method = parse_json[item_par]['pagamento']
+                        parser_zona=parse_json[item_par]['zona']
                         parser_tot_eur = parse_json[item_par]['totale']
                         if parse_json[item_par]['dati_utente'][0]['indirizzo'] == None:
                             parsed_addr = ""
@@ -263,7 +264,7 @@ while looper==0:
                                 print(tag)
                                 if tag_oc.text == "Consegna_Dati":
                                     print("Found & Replaced Consegna_Dati")
-                                    tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n")
+                                    tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n"+str(parser_dconsegna))
 
                             for tag_tot in soup.find_all(id='totale_ordine'):
                                 print("found_order")
@@ -280,6 +281,15 @@ while looper==0:
                                 if tag_tp.text == "Tipo_Pagamento":
                                     print("Found & Replaced tag_tp")
                                     tag_tp.string = (str(parser_payment_method))
+
+                            if parser_zona != 0:
+                                for tag_zone in soup.find_all(id='zone'):
+                                    print("found_order")
+                                    print(tag_zone.text)
+                                    print(tag)
+                                    if tag_zone.text == "":
+                                        print("Found & Replaced Zone")
+                                        tag_zone.string = (str(parser_payment_method))
 
                             for tag_tp in soup.find_all(id='tipo_pagamento'):
                                 print("found_order")
@@ -545,7 +555,7 @@ while looper==0:
                             print(tag)
                             if tag_oc.text == "Consegna_Dati":
                                 print("Found & Replaced Consegna_Dati")
-                                tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n")
+                                tag_oc.string = ("Consegna ore " + str(parser_orario) + " del \n"+str(parser_dconsegna))
 
                         for tag_tot in soup.find_all(id='totale_ordine'):
                             print("found_order")
@@ -570,6 +580,15 @@ while looper==0:
                             if tag_tp.text == "Tipo_Pagamento":
                                 print("Found & Replaced tag_tp")
                                 tag_tp.string = (str(parser_payment_method))
+
+                        if parser_zona != 0:
+                            for tag_zone in soup.find_all(id='zone'):
+                                print("found_order")
+                                print(tag_zone.text)
+                                print(tag)
+                                if tag_zone.text == "":
+                                    print("Found & Replaced Zone")
+                                    tag_zone.string = (str(parser_payment_method))
 
                         for tag_nln in soup.find_all(id='Nome_Cognome'):
                             print("found_order")
