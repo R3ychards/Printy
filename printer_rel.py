@@ -12,6 +12,7 @@ import ctypes
 import sys
 import operator
 from shutil import copyfile
+import base64
 
 def resource_path(relative_path):
     try:
@@ -44,7 +45,7 @@ window2 = sg.Window('Inserisci la tua chiave api', layout2)
 
 #Create config.ini file if not yet present
 if os.path.isfile('config.ini') and os.path.isfile('PaperSettings.ini'):
-    print("File already in path")
+    print("Readed config files")
 else:
     copyfile(resource_path('config.ini'), 'config.ini')
     copyfile(resource_path('PaperSettings.ini'), 'PaperSettings.ini')
@@ -66,32 +67,47 @@ First_run = config['API']['FirstRun']
 setupstep = config['API']['setupstep']
 maxwidth = configpap['PaperSettings']['maxwidth']
 fontsize = configpap['PaperSettings']['fontsize']
-apikey = config['API']['api_key']
+apikeyorig = config['API']['api_key']
+apikeyb64dec = base64.b64decode(apikeyorig)
+apikeyb64dec = apikeyb64dec.decode("utf-8")
+print(apikeyb64dec)
+apikey= apikeyb64dec
 api = (api_link+"api.php?key="+apikey)
 
-if api_link != "":
-    sg.popup("Api Key gia inserita")
+if api_link != "" and apikey != "":
+    sg.popup("Dati necessari gia inseriti")
 
-if api_link == "":
-    event, values = window.read()
-    window.close()
-    text_input = values[0]
 
-    sg.popup('Sito inserito con successo', text_input)
+if api_link == "" or apikey == "":
+    while api_link == "" or apikey == "":
+        event, values = window.read()
+        window.close()
+        text_input = values[0]
 
-    event2, values2 = window2.read()
-    window2.close()
-    key = values2[0]
+        sg.popup('Sito inserito con successo', text_input)
 
-    sg.popup('API key con successo', text_input)
-    config.set('API', 'api_link', text_input)
-    config.set('API', 'api_key', key)
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-        #time.sleep(0.4)
-    api_link = config['API']['api_link']
-    apikey = config['API']['api_key']
-    api = (api_link + "api.php?key=" + apikey)
+        event2, values2 = window2.read()
+        window2.close()
+        key = values2[0]
+
+        sg.popup('API key inserita e crittata con successo', key)
+        keyb64enc=base64.b64encode(bytearray(key, 'ascii')).decode('utf-8')
+        config.set('API', 'api_link', text_input)
+        config.set('API', 'api_key', keyb64enc)
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+            #time.sleep(0.4)
+        api_link = config['API']['api_link']
+        apikeyorig = config['API']['api_key']
+        apikeyb64dec = base64.b64decode(apikeyorig)
+        apikeyb64dec = apikeyb64dec.decode("utf-8")
+        apikey = apikeyb64dec
+        api = (api_link + "api.php?key=" + apikey)
+
+        if api_link=="":
+            sg.popup('Il sito o l api key non sono state inserite correttamente.', api_link, apikey)
+
+
 if First_run == ("True"):
     process = ""
     if setupstep == "0":
@@ -114,7 +130,7 @@ if First_run == ("True"):
 #Main cycle, with time
 looper=0
 while looper==0:
-    parse_json="";
+    parse_json=""
     print("Connection to api..")
     api_serve = requests.get(api)
     print("Server_Response:" + str(api_serve.status_code))
@@ -274,13 +290,23 @@ while looper==0:
                                     print("Found & Replaced tag_tot")
                                     tag_tot.string = (str(parser_tot_eur))
 
-                            for tag_tp in soup.find_all(id='tipo_pagamento'):
-                                print("found_order")
-                                print(tag_tp.text)
-                                print(tag)
-                                if tag_tp.text == "Tipo_Pagamento":
-                                    print("Found & Replaced tag_tp")
-                                    tag_tp.string = (str(parser_payment_method))
+                            if parser_t_o != "ritiro":
+                                for tag_tp in soup.find_all(id='tipo_pagamento'):
+                                    print("found_order")
+                                    print(tag_tp.text)
+                                    print(tag)
+                                    if tag_tp.text == "Tipo_Pagamento":
+                                        print("Found & Replaced tag_tp")
+                                        tag_tp.string = (str(parser_payment_method))
+                            if parser_t_o == "ritiro":
+                                for tag_tp in soup.find_all(id='tipo_pagamento'):
+                                    print("found_order")
+                                    print(tag_tp.text)
+                                    print(tag)
+                                    breakpoint()
+                                    if tag_tp.text == "Tipo_Pagamento":
+                                        print("Found & Replaced tag_tp")
+                                        tag_tp.string = ("Pagamento al Ritiro")
 
                             if parser_zona != 0:
                                 for tag_zone in soup.find_all(id='zone'):
@@ -289,15 +315,25 @@ while looper==0:
                                     print(tag)
                                     if tag_zone.text == "":
                                         print("Found & Replaced Zone")
-                                        tag_zone.string = (str(parser_payment_method))
+                                        tag_zone.string = ("Zona Consegna"+str(parser_zona))
 
-                            for tag_tp in soup.find_all(id='tipo_pagamento'):
-                                print("found_order")
-                                print(tag_tp.text)
-                                print(tag)
-                                if tag_tp.text == "Tipo_Pagamento":
-                                    print("Found & Replaced tag_tp")
-                                    tag_tp.string = (str(parser_payment_method))
+                            if parser_t_o != "ritiro":
+                                for tag_tp in soup.find_all(id='tipo_pagamento'):
+                                    print("found_order")
+                                    print(tag_tp.text)
+                                    print(tag)
+                                    if tag_tp.text == "Tipo_Pagamento":
+                                        print("Found & Replaced tag_tp")
+                                        tag_tp.string = (str(parser_payment_method))
+                            if parser_t_o == "ritiro":
+                                for tag_tp in soup.find_all(id='tipo_pagamento'):
+                                    print("found_order")
+                                    print(tag_tp.text)
+                                    print(tag)
+                                    breakpoint()
+                                    if tag_tp.text == "Tipo_Pagamento":
+                                        print("Found & Replaced tag_tp")
+                                        tag_tp.string = ("Pagamento al Ritiro")
 
                             for tag_nln in soup.find_all(id='Nome_Cognome'):
                                 print("found_order")
@@ -307,14 +343,25 @@ while looper==0:
                                     print("Found & Replaced tag_nln")
                                     tag_nln.string = (str(parser_name))
 
-                            for tag_addr in soup.find_all(id='address'):
-                                print("found_order")
-                                print(tag_addr.text)
-                                print(tag)
-                                if tag_addr.text == "dat_addr":
-                                    print("Found & Replaced tag_addr")
-                                    print(parser_addr)
-                                    tag_addr.string = (str(parser_addr))
+                            if parser_t_o != "ritiro":
+                                for tag_addr in soup.find_all(id='address'):
+                                    print("found_order")
+                                    print(tag_addr.text)
+                                    print(tag)
+                                    if tag_addr.text == "dat_addr":
+                                        print("Found & Replaced tag_addr")
+                                        print(parser_addr)
+                                        tag_addr.string = (str(parser_addr))
+                            if parser_t_o == "ritiro":
+                                for tag_addr in soup.find_all(id='address'):
+                                    print("found_order")
+                                    print(tag_addr.text)
+                                    print(tag)
+                                    if tag_addr.text == "dat_addr":
+                                        print("Found & Replaced RITIRO ORDINE")
+                                        print(parser_addr)
+                                        tag_addr.string = ("Ritiro, nessun indirizzo dato.")
+
 
                             for tag_tel in soup.find_all(id='tel'):
                                 print("found_order")
@@ -589,7 +636,7 @@ while looper==0:
                                 print(tag)
                                 if tag_zone.text == "":
                                     print("Found & Replaced Zone")
-                                    tag_zone.string = (str(parser_payment_method))
+                                    tag_zone.string = ("Zona Consegna"+str(parser_zona))
 
                         for tag_nln in soup.find_all(id='Nome_Cognome'):
                             print("found_order")
@@ -599,14 +646,25 @@ while looper==0:
                                 print("Found & Replaced tag_nln")
                                 tag_nln.string = (str(parser_name))
 
-                        for tag_addr in soup.find_all(id='address'):
-                            print("found_order")
-                            print(tag_addr.text)
-                            print(tag)
-                            if tag_addr.text == "dat_addr":
-                                print("Found & Replaced tag_addr")
-                                print(parser_addr)
-                                tag_addr.string = (str(parser_addr))
+
+                        if parser_t_o != "ritiro":
+                            for tag_addr in soup.find_all(id='address'):
+                                print("found_order")
+                                print(tag_addr.text)
+                                print(tag)
+                                if tag_addr.text == "dat_addr":
+                                    print("Found & Replaced tag_addr")
+                                    print(parser_addr)
+                                    tag_addr.string = (str(parser_addr))
+                        if parser_t_o == "ritiro":
+                            for tag_addr in soup.find_all(id='address'):
+                                print("found_order")
+                                print(tag_addr.text)
+                                print(tag)
+                                if tag_addr.text == "dat_addr":
+                                    print("Found & Replaced RITIRO ORDINE")
+                                    print(parser_addr)
+                                    tag_addr.string = ("Ritiro, nessun indirizzo dato.")
 
                         for tag_tel in soup.find_all(id='tel'):
                             print("found_order")
