@@ -180,7 +180,7 @@ while looper==0:
                         parser_data = parse_json[item_par]['nome_prodotto_lavorazione']
                         parser_oraacq = parse_json[item_par]['tempo_inizio_procedura_acquisto']
                         parser_payment_method = parse_json[item_par]['pagamento']
-                        parser_zona=parse_json[item_par]['zona']
+                        parser_zona = parse_json[item_par]['zona']
                         parser_tot_eur = parse_json[item_par]['totale']
                         if parse_json[item_par]['dati_utente'][0]['indirizzo'] == None:
                             parsed_addr = ""
@@ -470,6 +470,7 @@ while looper==0:
                     parser_nc = parse_json[item_par]['note_consegna']
                     parser_dconsegna = parse_json[item_par]['dataconsegna']
                     parser_data = parse_json[item_par]['nome_prodotto_lavorazione']
+                    parser_zona = parse_json[item_par]['zona']
                     parser_oraacq = parse_json[item_par]['tempo_inizio_procedura_acquisto']
                     parser_payment_method = parse_json[item_par]['pagamento']
                     parser_tot_eur = parse_json[item_par]['totale']
